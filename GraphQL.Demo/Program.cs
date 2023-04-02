@@ -1,5 +1,8 @@
 var builder = WebApplication.CreateBuilder(args);
 
+//Configure GraphQL Server
+builder.Services.AddGraphQLServer().AddQueryType<LibraryQuery>();
+
 // Add services to the container.
 builder.Services.AddRazorPages();
 
@@ -16,10 +19,16 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
-app.UseRouting();
+app.UseRouting().UseEndpoints(endpoints => endpoints.MapGraphQL());
 
 app.UseAuthorization();
 
 app.MapRazorPages();
 
 app.Run();
+
+
+//Implement GraphQL
+public class LibraryQuery{
+
+}
