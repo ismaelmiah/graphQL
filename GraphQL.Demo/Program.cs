@@ -1,5 +1,4 @@
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddGraphQLServer().AddQueryType<LibraryQuery>();
 
 // Add services to the container.
 builder.Services.AddRazorPages();
@@ -24,9 +23,3 @@ app.UseAuthorization();
 app.MapRazorPages();
 
 app.Run();
-
-// GraphQL related implementation
-
-public class LibraryQuery{
-    
-}
