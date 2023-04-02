@@ -4,7 +4,7 @@ public class CourseType
     public string Name { get; set; }
     public Subject Subject { get; set; }
     [GraphQLNonNullType]
-    public InstructorType InstructorType { get; set; }
+    public InstructorType Instructor { get; set; }
     [GraphQLNonNullType]
     public IEnumerable<StudentType> Students { get; set; }
 }
