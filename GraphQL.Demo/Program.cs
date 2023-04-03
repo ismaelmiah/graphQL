@@ -1,7 +1,9 @@
 var builder = WebApplication.CreateBuilder(args);
 
 //Configure GraphQL Server
-builder.Services.AddGraphQLServer().AddQueryType<LibraryQuery>();
+builder.Services.AddGraphQLServer()
+                .AddQueryType<LibraryQuery>()
+                .AddMutationType<Mutation>();
 
 // Add services to the container.
 builder.Services.AddRazorPages();

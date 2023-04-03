@@ -1,8 +1,8 @@
-
 using Bogus;
 
 public record Book(string Title, Author Author);
 public record Author(string Name);
+
 public class LibraryQuery
 {
     private readonly List<Book?> _book;
