@@ -3,7 +3,10 @@ var builder = WebApplication.CreateBuilder(args);
 //Configure GraphQL Server
 builder.Services.AddGraphQLServer()
                 .AddQueryType<LibraryQuery>()
-                .AddMutationType<Mutation>();
+                .AddMutationType<Mutation>()
+                .AddSubscriptionType<Subscription>();
+
+builder.Services.AddInMemorySubscriptions();
 
 // Add services to the container.
 builder.Services.AddRazorPages();
@@ -22,6 +25,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting().UseEndpoints(endpoints => endpoints.MapGraphQL());
+
+app.UseWebSockets();
 
 app.UseAuthorization();
 
