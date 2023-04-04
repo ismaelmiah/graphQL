@@ -23,10 +23,9 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+app.UseWebSockets();
 
 app.UseRouting().UseEndpoints(endpoints => endpoints.MapGraphQL());
-
-app.UseWebSockets();
 
 app.UseAuthorization();
 
