@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 //Configure GraphQL Server
@@ -8,10 +10,22 @@ builder.Services.AddGraphQLServer()
 
 builder.Services.AddInMemorySubscriptions();
 
+string? connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddPooledDbContextFactory<SchoolDbContext>(opt => opt.UseSqlite(connectionString));
+
 // Add services to the container.
 builder.Services.AddRazorPages();
 
 var app = builder.Build();
+
+using (IServiceScope scope = app.Services.CreateScope())
+{
+    IDbContextFactory<SchoolDbContext> contextFactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<SchoolDbContext>>();
+    using (SchoolDbContext context = contextFactory.CreateDbContext())
+    {
+        context.Database.Migrate();
+    }
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
