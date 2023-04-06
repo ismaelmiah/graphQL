@@ -16,6 +16,9 @@ builder.Services.AddPooledDbContextFactory<SchoolDbContext>(opt => opt.UseSqlite
 // Add services to the container.
 builder.Services.AddRazorPages();
 
+
+builder.Services.AddScoped<CoursesRepository>();
+
 var app = builder.Build();
 
 using (IServiceScope scope = app.Services.CreateScope())
