@@ -19,19 +19,27 @@ public class Mutation
             InstructorId = courseInput.InstructorId
         };
 
-        var courseResult = await _coursesRepository.Create(courseDto);
-
-        CourseResult course = new CourseResult
+        try
         {
-            Id = courseResult.Id,
-            Name = courseResult.Name,
-            Subject = courseResult.Subject,
-            InstructorId = courseResult.InstructorId
-        };
+            var courseResult = await _coursesRepository.Create(courseDto);
 
-        await topicEventSender.SendAsync(nameof(Subscription.CourseCreated), course);
+            CourseResult course = new CourseResult
+            {
+                Id = courseResult.Id,
+                Name = courseResult.Name,
+                Subject = courseResult.Subject,
+                InstructorId = courseResult.InstructorId
+            };
 
-        return course;
+            await topicEventSender.SendAsync(nameof(Subscription.CourseCreated), course);
+
+            return course;
+
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
     }
 
     public async Task<CourseResult> UpdateCourse(Guid id, CourseInputType courseInput, [Service] ITopicEventSender topicEventSender)
