@@ -6,12 +6,9 @@ public record Author(string Name);
 public class LibraryQuery
 {
     private readonly List<Book?> _book;
-    private readonly Faker<InstructorType> _instructorFaker;
-    private readonly Faker<StudentType> _studentFaker;
-    private readonly Faker<CourseType> _courseFaker;
+    private readonly CoursesRepository _courseRepository;
 
-
-    public LibraryQuery()
+    public LibraryQuery(CoursesRepository courseRepository)
     {
         _book = new(){
                     new Book("I Love GraphQL", new Author("Brandon Minnick")),
@@ -20,24 +17,7 @@ public class LibraryQuery
                     null
                 };
 
-        _instructorFaker = new Faker<InstructorType>()
-                            .RuleFor(c => c.Id, f => Guid.NewGuid())
-                            .RuleFor(c => c.FirstName, f => f.Name.FirstName())
-                            .RuleFor(c => c.LastName, f => f.Name.LastName())
-                            .RuleFor(c => c.Salary, f => f.Random.Double(0, 100000));
-
-        _studentFaker = new Faker<StudentType>()
-                        .RuleFor(c => c.Id, f => Guid.NewGuid())
-                        .RuleFor(c => c.FirstName, f => f.Name.FirstName())
-                        .RuleFor(c => c.LastName, f => f.Name.LastName())
-                        .RuleFor(c => c.GPA, f => f.Random.Double(1, 4));
-
-        _courseFaker = new Faker<CourseType>()
-                        .RuleFor(c => c.Id, f => Guid.NewGuid())
-                        .RuleFor(c => c.Name, f => f.Name.JobTitle())
-                        .RuleFor(c => c.Subject, f => f.PickRandom<Subject>())
-                        .RuleFor(c => c.Instructor, f => _instructorFaker.Generate())
-                        .RuleFor(c => c.Students, f => _studentFaker.Generate(3));
+        _courseRepository = courseRepository;
     }
 
     [GraphQLDeprecated("This query is deprecated.")]
@@ -49,28 +29,46 @@ public class LibraryQuery
     [GraphQLDeprecated("This query is deprecated.")]
     public Author? GetAuthor(string name) => _book.Where(x => x?.Author.Name == name).FirstOrDefault()?.Author;
 
-    public IEnumerable<CourseType> GetCourses()
+    public async Task<IEnumerable<CourseType>> GetCourses()
     {
 
-        return _courseFaker.Generate(5);
-        // return new List<CourseType>()
-        // {
-        //     new CourseType(){
-        //         Id = Guid.NewGuid(),
-        //         Name = "Geomatry",
-        //         Subject = Subject.Mathematics,
-        //         InstructorType = new(){ Id = Guid.NewGuid() }
-        //     }
-        // };
+        return (await _courseRepository.GetAll()).Select(c => new CourseType{
+            Name = c.Name,
+            Subject = c.Subject,
+            Instructor = new InstructorType{
+                Id = c.InstructorId,
+                FirstName = c.Instructor.FirstName,
+                LastName = c.Instructor.LastName,
+                Salary = c.Instructor.Salary
+            },
+            Students = c.Students.Select(s => new StudentType{
+                Id = s.Id,
+                FirstName = s.FirstName,
+                LastName = s.LastName,
+                GPA = s.GPA
+            })
+        });
     }
 
     public async Task<CourseType> GetCourseByIdAsync(Guid id)
     {
-        await Task.Delay(1000);
-        CourseType course = _courseFaker.Generate();
+        var course = await _courseRepository.GetById(id);        
 
-        course.Id = id;
-
-        return course;
+        return new CourseType{
+            Name = course.Name,
+            Subject = course.Subject,
+            Instructor = new InstructorType{
+                Id = course.InstructorId,
+                FirstName = course.Instructor.FirstName,
+                LastName = course.Instructor.LastName,
+                Salary = course.Instructor.Salary
+            },
+            Students = course.Students.Select(s => new StudentType{
+                Id = s.Id,
+                FirstName = s.FirstName,
+                LastName = s.LastName,
+                GPA = s.GPA
+            })
+        };
     }
 }

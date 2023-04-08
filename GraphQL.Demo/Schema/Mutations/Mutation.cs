@@ -71,6 +71,11 @@ public class Mutation
 
     public async Task<bool> DeleteCourse(Guid id)
     {
-        return await _coursesRepository.Delete(id);
+        try{
+            return await _coursesRepository.Delete(id);
+        }
+        catch{
+            return false;
+        }
     }
 }
