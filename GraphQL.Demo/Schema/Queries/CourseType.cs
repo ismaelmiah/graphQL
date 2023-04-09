@@ -6,8 +6,9 @@ public class CourseType
     public Guid InstructorId { get; set; }
 
     [GraphQLNonNullType]
-    public async Task<InstructorType> Instructor([Service] InstructorRepository instructorRepository){
-        var instructor = await instructorRepository.GetById(this.InstructorId);
+    public async Task<InstructorType> Instructor([Service] InstructorLoader instructorLoader){
+        var instructor = await instructorLoader.LoadAsync(this.InstructorId);
+        
         return new InstructorType{
             Id = instructor.Id,
             FirstName = instructor.FirstName,

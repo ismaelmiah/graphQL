@@ -19,6 +19,7 @@ builder.Services.AddRazorPages();
 
 builder.Services.AddScoped<CoursesRepository>();
 builder.Services.AddScoped<InstructorRepository>();
+builder.Services.AddScoped<InstructorLoader>();
 
 var app = builder.Build();
 

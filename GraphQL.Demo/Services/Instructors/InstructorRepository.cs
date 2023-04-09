@@ -47,4 +47,13 @@ public class InstructorRepository{
             return instructor;
         }
     }
+
+    public async Task<IEnumerable<InstructorDto>> GetByIds(IReadOnlyList<Guid> instructorIds)
+    {
+        Console.WriteLine(instructorIds);
+        using (SchoolDbContext context = _contextFactory.CreateDbContext())
+        {
+            return await context.Instructors.Where(i => instructorIds.Contains(i.Id)).ToListAsync();
+        }
+    }
 }
