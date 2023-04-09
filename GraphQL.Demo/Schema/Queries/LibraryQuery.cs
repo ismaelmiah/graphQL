@@ -33,20 +33,10 @@ public class LibraryQuery
     {
 
         return (await _courseRepository.GetAll()).Select(c => new CourseType{
+            Id = c.Id,
             Name = c.Name,
             Subject = c.Subject,
-            Instructor = new InstructorType{
-                Id = c.InstructorId,
-                FirstName = c.Instructor.FirstName,
-                LastName = c.Instructor.LastName,
-                Salary = c.Instructor.Salary
-            },
-            Students = c.Students.Select(s => new StudentType{
-                Id = s.Id,
-                FirstName = s.FirstName,
-                LastName = s.LastName,
-                GPA = s.GPA
-            })
+            InstructorId = c.InstructorId
         });
     }
 
@@ -55,20 +45,10 @@ public class LibraryQuery
         var course = await _courseRepository.GetById(id);        
 
         return new CourseType{
+            Id = course.Id,
             Name = course.Name,
             Subject = course.Subject,
-            Instructor = new InstructorType{
-                Id = course.InstructorId,
-                FirstName = course.Instructor.FirstName,
-                LastName = course.Instructor.LastName,
-                Salary = course.Instructor.Salary
-            },
-            Students = course.Students.Select(s => new StudentType{
-                Id = s.Id,
-                FirstName = s.FirstName,
-                LastName = s.LastName,
-                GPA = s.GPA
-            })
+            InstructorId = course.InstructorId
         };
     }
 }
