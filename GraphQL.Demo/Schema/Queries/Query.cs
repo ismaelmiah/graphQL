@@ -10,6 +10,7 @@ public class Query
         _courseRepository = courseRepository;
     }
 
+    [UsePaging(IncludeTotalCount = true, DefaultPageSize = 2)]
     public async Task<IEnumerable<CourseType>> GetCourses()
     {
 
