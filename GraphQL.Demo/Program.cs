@@ -4,7 +4,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 //Configure GraphQL Server
 builder.Services.AddGraphQLServer()
-                .AddQueryType<LibraryQuery>()
+                .AddQueryType<Query>()
                 .AddMutationType<Mutation>()
                 .AddSubscriptionType<Subscription>();
 
