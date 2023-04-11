@@ -10,10 +10,9 @@ public class Query
         _courseRepository = courseRepository;
     }
 
-    [UsePaging(IncludeTotalCount = true, DefaultPageSize = 2)]
+    [UseOffsetPaging(IncludeTotalCount = true, DefaultPageSize = 2)]
     public async Task<IEnumerable<CourseType>> GetCourses()
     {
-
         return (await _courseRepository.GetAll()).Select(c => new CourseType{
             Id = c.Id,
             Name = c.Name,

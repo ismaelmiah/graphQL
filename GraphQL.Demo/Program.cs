@@ -11,7 +11,8 @@ builder.Services.AddGraphQLServer()
 builder.Services.AddInMemorySubscriptions();
 
 string? connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddPooledDbContextFactory<SchoolDbContext>(opt => opt.UseSqlite(connectionString));
+builder.Services.AddPooledDbContextFactory<SchoolDbContext>(
+    opt => opt.UseSqlite(connectionString).LogTo(Console.WriteLine));
 
 // Add services to the container.
 builder.Services.AddRazorPages();
