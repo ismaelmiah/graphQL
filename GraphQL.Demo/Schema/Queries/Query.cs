@@ -10,10 +10,11 @@ public class Query
         _courseRepository = courseRepository;
     }
 
-    [UseOffsetPaging(IncludeTotalCount = true, DefaultPageSize = 2)]
-    public async Task<IEnumerable<CourseType>> GetCourses()
+    [UseDbContext(typeof(SchoolDbContext))]
+    [UsePaging(IncludeTotalCount = true, DefaultPageSize = 2)]
+    public IQueryable<CourseType> GetCourses([ScopedService] SchoolDbContext context)
     {
-        return (await _courseRepository.GetAll()).Select(c => new CourseType{
+        return context.Courses.Select(c => new CourseType{
             Id = c.Id,
             Name = c.Name,
             Subject = c.Subject,
