@@ -12,9 +12,23 @@ public class Query
 
     [UseDbContext(typeof(SchoolDbContext))]
     [UsePaging(IncludeTotalCount = true, DefaultPageSize = 2)]
-    public IQueryable<CourseType> GetCourses([ScopedService] SchoolDbContext context)
+    [UseFiltering]
+    public IQueryable<CourseType> GetPaginatedCourses([ScopedService] SchoolDbContext context)
     {
         return context.Courses.Select(c => new CourseType{
+            Id = c.Id,
+            Name = c.Name,
+            Subject = c.Subject,
+            InstructorId = c.InstructorId
+        });
+    }
+
+
+    public async Task<IEnumerable<CourseType>> GetCourses([ScopedService] SchoolDbContext context)
+    {
+        var courses =await _courseRepository.GetAll();
+
+        return courses.Select(c => new CourseType{
             Id = c.Id,
             Name = c.Name,
             Subject = c.Subject,
