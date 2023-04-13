@@ -13,6 +13,7 @@ public class Query
     [UseDbContext(typeof(SchoolDbContext))]
     [UsePaging(IncludeTotalCount = true, DefaultPageSize = 2)]
     [UseFiltering(typeof(CourseFilterType))]
+    [UseSorting]
     public IQueryable<CourseType> GetPaginatedCourses([ScopedService] SchoolDbContext context)
     {
         return context.Courses.Select(c => new CourseType{
