@@ -1,3 +1,4 @@
+using FirebaseAdminAuthentication.DependencyInjection.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,7 +10,10 @@ builder.Services.AddGraphQLServer()
                 .AddSubscriptionType<Subscription>()
                 .AddFiltering()
                 .AddSorting()
-                .AddProjections();
+                .AddProjections()
+                .AddAuthorization();
+
+builder.Services.AddFirebaseAuthentication();
 
 builder.Services.AddInMemorySubscriptions();
 
@@ -48,10 +52,11 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseWebSockets();
 
-app.UseRouting().UseEndpoints(endpoints => endpoints.MapGraphQL());
+app.UseRouting();
 
-app.UseAuthorization();
+app.UseAuthentication();
 
+app.UseEndpoints(endpoints => endpoints.MapGraphQL());
 app.MapRazorPages();
 
 app.Run();

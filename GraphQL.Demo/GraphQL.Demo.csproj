@@ -10,5 +10,7 @@
     <PackageReference Include="HotChocolate.Data.EntityFramework" Version="12.7.0"/>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.4"/>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.4"/>
+    <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="12.3.2"/>
+    <PackageReference Include="FirebaseAdminAuthentication.DependencyInjection" Version="1.1.0"/>
   </ItemGroup>
 </Project>
