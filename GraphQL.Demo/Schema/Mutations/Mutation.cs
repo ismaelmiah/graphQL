@@ -1,5 +1,8 @@
 
 
+using System.Security.Claims;
+using FirebaseAdminAuthentication.DependencyInjection.Models;
+using HotChocolate.AspNetCore.Authorization;
 using HotChocolate.Subscriptions;
 
 public class Mutation
@@ -10,8 +13,12 @@ public class Mutation
         _coursesRepository = coursesRepository;
     }
 
-    public async Task<CourseResult> CreateCourse(CourseInputType courseInput, [Service] ITopicEventSender topicEventSender)
+    [Authorize]
+    public async Task<CourseResult> CreateCourse(CourseInputType courseInput, [Service] ITopicEventSender topicEventSender, ClaimsPrincipal claimsPrinciple)
     {
+        string userId = claimsPrinciple.FindFirstValue(FirebaseUserClaimType.ID);
+        string email = claimsPrinciple.FindFirstValue(FirebaseUserClaimType.EMAIL);
+
         CourseDto courseDto = new CourseDto
         {
             Name = courseInput.Name,
@@ -42,6 +49,7 @@ public class Mutation
         }
     }
 
+    [Authorize]
     public async Task<CourseResult> UpdateCourse(Guid id, CourseInputType courseInput, [Service] ITopicEventSender topicEventSender)
     {
 
@@ -69,6 +77,7 @@ public class Mutation
         return course;
     }
 
+    [Authorize]
     public async Task<bool> DeleteCourse(Guid id)
     {
         try{

@@ -1,3 +1,4 @@
+using FirebaseAdmin;
 using FirebaseAdminAuthentication.DependencyInjection.Extensions;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,6 +13,8 @@ builder.Services.AddGraphQLServer()
                 .AddSorting()
                 .AddProjections()
                 .AddAuthorization();
+
+builder.Services.AddSingleton(FirebaseApp.Create());
 
 builder.Services.AddFirebaseAuthentication();
 
