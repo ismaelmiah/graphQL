@@ -1,5 +1,3 @@
-
-
 using System.Security.Claims;
 using FirebaseAdminAuthentication.DependencyInjection.Models;
 using HotChocolate.AspNetCore.Authorization;
@@ -77,7 +75,7 @@ public class Mutation
         return course;
     }
 
-    [Authorize]
+    [Authorize(Policy = "IsAdmin")]
     public async Task<bool> DeleteCourse(Guid id)
     {
         try{

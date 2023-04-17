@@ -1,7 +1,6 @@
 public class CourseType
 {
     public Guid Id { get; set; }
-    [IsProjected(false)]
     public string Name { get; set; }
     public Subject Subject { get; set; }
     [IsProjected(true)]

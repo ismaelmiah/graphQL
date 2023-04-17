@@ -1,5 +1,7 @@
 using FirebaseAdmin;
 using FirebaseAdminAuthentication.DependencyInjection.Extensions;
+using FirebaseAdminAuthentication.DependencyInjection.Models;
+using Google.Apis.Auth.OAuth2;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,9 +16,17 @@ builder.Services.AddGraphQLServer()
                 .AddProjections()
                 .AddAuthorization();
 
-builder.Services.AddSingleton(FirebaseApp.Create());
+builder.Services.AddSingleton(FirebaseApp.Create(new AppOptions()
+{
+    Credential = GoogleCredential.FromFile(builder.Configuration.GetValue<string>("FIREBASE_CONFIG"))
+}));
 
 builder.Services.AddFirebaseAuthentication();
+builder.Services.AddAuthorization(opt => {
+    opt.AddPolicy("IsAdmin", policy=> {
+        policy.RequireClaim(FirebaseUserClaimType.EMAIL, "ismail27.dec@gmail.com");
+    });
+});
 
 builder.Services.AddInMemorySubscriptions();
 
