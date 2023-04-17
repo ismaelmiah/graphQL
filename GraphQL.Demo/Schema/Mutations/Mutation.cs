@@ -15,12 +15,12 @@ public class Mutation
     public async Task<CourseResult> CreateCourse(CourseInputType courseInput, [Service] ITopicEventSender topicEventSender, ClaimsPrincipal claimsPrinciple)
     {
         string userId = claimsPrinciple.FindFirstValue(FirebaseUserClaimType.ID);
-        string email = claimsPrinciple.FindFirstValue(FirebaseUserClaimType.EMAIL);
 
         CourseDto courseDto = new CourseDto
         {
             Name = courseInput.Name,
             Subject = courseInput.Subject,
+            CreatorId = userId,
             InstructorId = courseInput.InstructorId
         };
 
@@ -48,25 +48,35 @@ public class Mutation
     }
 
     [Authorize]
-    public async Task<CourseResult> UpdateCourse(Guid id, CourseInputType courseInput, [Service] ITopicEventSender topicEventSender)
+    public async Task<CourseResult> UpdateCourse(Guid id, CourseInputType courseInput, [Service] ITopicEventSender topicEventSender, ClaimsPrincipal claimsPrinciple)
     {
 
-        CourseDto courseDto = new CourseDto
-        {
-            Id = id,
-            Name = courseInput.Name,
-            Subject = courseInput.Subject,
-            InstructorId = courseInput.InstructorId
-        };
+        string userId = claimsPrinciple.FindFirstValue(FirebaseUserClaimType.ID);
 
-        courseDto = await _coursesRepository.Update(courseDto);
+        CourseDto courseDTO = await _coursesRepository.GetById(id);
+
+        if (courseDTO == null)
+        {
+            throw new GraphQLException(new Error("Course not found.", "COURSE_NOT_FOUND"));
+        }
+
+        if (courseDTO.CreatorId != userId)
+        {
+            throw new GraphQLException(new Error("You do not have permission to update this course.", "INVALID_PERMISSION"));
+        }
+
+        courseDTO.Name = courseInput.Name;
+        courseDTO.Subject = courseInput.Subject;
+        courseDTO.InstructorId = courseInput.InstructorId;
+
+        courseDTO = await _coursesRepository.Update(courseDTO);
 
         CourseResult course = new CourseResult
         {
-            Id = courseDto.Id,
-            Name = courseDto.Name,
-            Subject = courseDto.Subject,
-            InstructorId = courseDto.InstructorId
+            Id = courseDTO.Id,
+            Name = courseDTO.Name,
+            Subject = courseDTO.Subject,
+            InstructorId = courseDTO.InstructorId
         };
 
         string updateCourseTopic = $"{course.Id}_{nameof(Subscription.CourseUpdate)}";
@@ -78,10 +88,12 @@ public class Mutation
     [Authorize(Policy = "IsAdmin")]
     public async Task<bool> DeleteCourse(Guid id)
     {
-        try{
+        try
+        {
             return await _coursesRepository.Delete(id);
         }
-        catch{
+        catch
+        {
             return false;
         }
     }

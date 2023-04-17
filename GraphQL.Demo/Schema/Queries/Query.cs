@@ -11,7 +11,7 @@ public class Query
     }
 
     [UseDbContext(typeof(SchoolDbContext))]
-    [UsePaging(IncludeTotalCount = true, DefaultPageSize = 2)]
+    [UsePaging(IncludeTotalCount = true)]
     [UseProjection()]
     [UseFiltering(typeof(CourseFilterType))]
     [UseSorting(typeof(CourseSortType))]
@@ -21,7 +21,8 @@ public class Query
             Id = c.Id,
             Name = c.Name,
             Subject = c.Subject,
-            InstructorId = c.InstructorId
+            InstructorId = c.InstructorId,
+            CreatorId = c.CreatorId
         });
     }
 
