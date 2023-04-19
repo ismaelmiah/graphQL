@@ -3,6 +3,7 @@ public class CourseType
     public Guid Id { get; set; }
     public string Name { get; set; }
     public Subject Subject { get; set; }
+    [IsProjected(true)]
     public string CreatorId { get; set; }
     [IsProjected(true)]
     public Guid InstructorId { get; set; }
@@ -21,4 +22,14 @@ public class CourseType
         };
     }
     public IEnumerable<StudentType> Students { get; set; }
+    public async Task<UserType> Creator()
+    {
+        var userRecord = await FirebaseAdmin.Auth.FirebaseAuth.DefaultInstance.GetUserAsync(CreatorId);
+        return new UserType()
+        {
+            Id = CreatorId,
+            UserName = userRecord.DisplayName,
+            PhotoUrl = userRecord.PhotoUrl
+        };
+    }
 }
