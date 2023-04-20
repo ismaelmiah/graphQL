@@ -2,7 +2,6 @@ using Microsoft.EntityFrameworkCore;
 
 public class CoursesRepository
 {
-
     private readonly IDbContextFactory<SchoolDbContext> _contextFactory;
 
     public CoursesRepository(IDbContextFactory<SchoolDbContext> contextFactory)

@@ -37,10 +37,10 @@ builder.Services.AddPooledDbContextFactory<SchoolDbContext>(
 // Add services to the container.
 builder.Services.AddRazorPages();
 
-
 builder.Services.AddScoped<CoursesRepository>();
 builder.Services.AddScoped<InstructorRepository>();
 builder.Services.AddScoped<InstructorLoader>();
+builder.Services.AddScoped<UserDataLoader>();
 
 var app = builder.Build();
 

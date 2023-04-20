@@ -22,14 +22,10 @@ public class CourseType
         };
     }
     public IEnumerable<StudentType> Students { get; set; }
-    public async Task<UserType> Creator()
+    public async Task<UserType> Creator([Service] UserDataLoader userDataLoader)
     {
-        var userRecord = await FirebaseAdmin.Auth.FirebaseAuth.DefaultInstance.GetUserAsync(CreatorId);
-        return new UserType()
-        {
-            Id = CreatorId,
-            UserName = userRecord.DisplayName,
-            PhotoUrl = userRecord.PhotoUrl
-        };
+        if(CreatorId == null) return null;
+
+        return await userDataLoader.LoadAsync(CreatorId, CancellationToken.None);
     }
 }
