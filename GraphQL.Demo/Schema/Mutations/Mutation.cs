@@ -1,19 +1,24 @@
 using System.Security.Claims;
 using FirebaseAdminAuthentication.DependencyInjection.Models;
+using FluentValidation.Results;
 using HotChocolate.AspNetCore.Authorization;
 using HotChocolate.Subscriptions;
 
 public class Mutation
 {
     private readonly CoursesRepository _coursesRepository;
-    public Mutation(CoursesRepository coursesRepository)
+    private readonly CourseTypeInputValidator _courseTypeInputValidator;
+    public Mutation(CoursesRepository coursesRepository, CourseTypeInputValidator courseTypeInputValidator)
     {
         _coursesRepository = coursesRepository;
+        _courseTypeInputValidator = courseTypeInputValidator;
     }
 
     [Authorize]
     public async Task<CourseResult> CreateCourse(CourseInputType courseInput, [Service] ITopicEventSender topicEventSender, ClaimsPrincipal claimsPrinciple)
     {
+        Validate(courseInput);
+
         string userId = claimsPrinciple.FindFirstValue(FirebaseUserClaimType.ID);
 
         CourseDto courseDto = new CourseDto
@@ -47,10 +52,19 @@ public class Mutation
         }
     }
 
+    private void Validate(CourseInputType courseInput)
+    {
+        ValidationResult validationResult = _courseTypeInputValidator.Validate(courseInput);
+        if (!validationResult.IsValid)
+        {
+            throw new GraphQLException("Invalid input.");
+        }
+    }
+
     [Authorize]
     public async Task<CourseResult> UpdateCourse(Guid id, CourseInputType courseInput, [Service] ITopicEventSender topicEventSender, ClaimsPrincipal claimsPrinciple)
     {
-
+        Validate(courseInput);
         string userId = claimsPrinciple.FindFirstValue(FirebaseUserClaimType.ID);
 
         CourseDto courseDTO = await _coursesRepository.GetById(id);

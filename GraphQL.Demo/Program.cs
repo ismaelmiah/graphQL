@@ -1,11 +1,14 @@
 using FirebaseAdmin;
 using FirebaseAdminAuthentication.DependencyInjection.Extensions;
 using FirebaseAdminAuthentication.DependencyInjection.Models;
+using FluentValidation.AspNetCore;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddFluentValidation();
+builder.Services.AddTransient<CourseTypeInputValidator>();
 //Configure GraphQL Server
 builder.Services.AddGraphQLServer()
                 .AddQueryType<Query>()
