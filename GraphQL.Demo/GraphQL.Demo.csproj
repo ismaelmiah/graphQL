@@ -14,5 +14,6 @@
     <PackageReference Include="FirebaseAdminAuthentication.DependencyInjection" Version="1.1.0"/>
     <PackageReference Include="FluentValidation" Version="11.5.2"/>
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0"/>
+    <PackageReference Include="AppAny.HotChocolate.FluentValidation" Version="0.6.3"/>
   </ItemGroup>
 </Project>
