@@ -1,7 +1,4 @@
-using System.Security.Claims;
 using AppAny.HotChocolate.FluentValidation;
-using FirebaseAdminAuthentication.DependencyInjection.Models;
-using FluentValidation.Results;
 using HotChocolate.AspNetCore.Authorization;
 using HotChocolate.Subscriptions;
 
@@ -14,15 +11,17 @@ public class Mutation
     }
 
     [Authorize]
-    public async Task<CourseResult> CreateCourse([UseFluentValidation, UseValidator<CourseTypeInputValidator>]CourseInputType courseInput, [Service] ITopicEventSender topicEventSender, ClaimsPrincipal claimsPrinciple)
+    [UseUser]
+    public async Task<CourseResult> CreateCourse(
+        [UseFluentValidation, UseValidator<CourseTypeInputValidator>] CourseInputType courseInput,
+        [Service] ITopicEventSender topicEventSender,
+        [User] User user)
     {
-        string userId = claimsPrinciple.FindFirstValue(FirebaseUserClaimType.ID);
-
         CourseDto courseDto = new CourseDto
         {
             Name = courseInput.Name,
             Subject = courseInput.Subject,
-            CreatorId = userId,
+            CreatorId = user.Id,
             InstructorId = courseInput.InstructorId
         };
 
@@ -50,10 +49,13 @@ public class Mutation
     }
 
     [Authorize]
-    public async Task<CourseResult> UpdateCourse(Guid id, CourseInputType courseInput, [Service] ITopicEventSender topicEventSender, ClaimsPrincipal claimsPrinciple)
+    [UseUser]
+    public async Task<CourseResult> UpdateCourse(
+        Guid id,
+        CourseInputType courseInput,
+        [Service] ITopicEventSender topicEventSender,
+        [User] User user)
     {
-        string userId = claimsPrinciple.FindFirstValue(FirebaseUserClaimType.ID);
-
         CourseDto courseDTO = await _coursesRepository.GetById(id);
 
         if (courseDTO == null)
@@ -61,7 +63,7 @@ public class Mutation
             throw new GraphQLException(new Error("Course not found.", "COURSE_NOT_FOUND"));
         }
 
-        if (courseDTO.CreatorId != userId)
+        if (courseDTO.CreatorId != user.Id)
         {
             throw new GraphQLException(new Error("You do not have permission to update this course.", "INVALID_PERMISSION"));
         }
