@@ -1,5 +1,5 @@
-
-
+using AppAny.HotChocolate.FluentValidation;
+using HotChocolate.AspNetCore.Authorization;
 using HotChocolate.Subscriptions;
 
 public class Mutation
@@ -10,12 +10,18 @@ public class Mutation
         _coursesRepository = coursesRepository;
     }
 
-    public async Task<CourseResult> CreateCourse(CourseInputType courseInput, [Service] ITopicEventSender topicEventSender)
+    [Authorize]
+    [UseUser]
+    public async Task<CourseResult> CreateCourse(
+        [UseFluentValidation, UseValidator<CourseTypeInputValidator>] CourseInputType courseInput,
+        [Service] ITopicEventSender topicEventSender,
+        [User] User user)
     {
         CourseDto courseDto = new CourseDto
         {
             Name = courseInput.Name,
             Subject = courseInput.Subject,
+            CreatorId = user.Id,
             InstructorId = courseInput.InstructorId
         };
 
@@ -42,25 +48,38 @@ public class Mutation
         }
     }
 
-    public async Task<CourseResult> UpdateCourse(Guid id, CourseInputType courseInput, [Service] ITopicEventSender topicEventSender)
+    [Authorize]
+    [UseUser]
+    public async Task<CourseResult> UpdateCourse(
+        Guid id,
+        CourseInputType courseInput,
+        [Service] ITopicEventSender topicEventSender,
+        [User] User user)
     {
+        CourseDto courseDTO = await _coursesRepository.GetById(id);
 
-        CourseDto courseDto = new CourseDto
+        if (courseDTO == null)
         {
-            Id = id,
-            Name = courseInput.Name,
-            Subject = courseInput.Subject,
-            InstructorId = courseInput.InstructorId
-        };
+            throw new GraphQLException(new Error("Course not found.", "COURSE_NOT_FOUND"));
+        }
 
-        courseDto = await _coursesRepository.Update(courseDto);
+        if (courseDTO.CreatorId != user.Id)
+        {
+            throw new GraphQLException(new Error("You do not have permission to update this course.", "INVALID_PERMISSION"));
+        }
+
+        courseDTO.Name = courseInput.Name;
+        courseDTO.Subject = courseInput.Subject;
+        courseDTO.InstructorId = courseInput.InstructorId;
+
+        courseDTO = await _coursesRepository.Update(courseDTO);
 
         CourseResult course = new CourseResult
         {
-            Id = courseDto.Id,
-            Name = courseDto.Name,
-            Subject = courseDto.Subject,
-            InstructorId = courseDto.InstructorId
+            Id = courseDTO.Id,
+            Name = courseDTO.Name,
+            Subject = courseDTO.Subject,
+            InstructorId = courseDTO.InstructorId
         };
 
         string updateCourseTopic = $"{course.Id}_{nameof(Subscription.CourseUpdate)}";
@@ -69,12 +88,15 @@ public class Mutation
         return course;
     }
 
+    [Authorize(Policy = "IsAdmin")]
     public async Task<bool> DeleteCourse(Guid id)
     {
-        try{
+        try
+        {
             return await _coursesRepository.Delete(id);
         }
-        catch{
+        catch
+        {
             return false;
         }
     }
